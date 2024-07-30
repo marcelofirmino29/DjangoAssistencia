@@ -104,6 +104,7 @@ class SelSabor(models.Model):
         verbose_name_plural = 'A - SelSabor'
 
 # Sacolas de Itens
+# Sacolas de Itens
 class SacolaItens(models.Model):
     pizzas = models.ManyToManyField(MontaPizza)
     preco = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -112,8 +113,8 @@ class SacolaItens(models.Model):
         return f'R$ {self.preco:.2f}'
 
     def preco_total(self):
+        # Certifica-se de que a sacola já tenha um ID antes de tentar calcular o preço total
         if not self.pk:
-            # Se o objeto ainda não tem um ID, não calcular o preço
             return 0
         sacola_total = sum(pizza.preco_total() for pizza in self.pizzas.all())
         return sacola_total
@@ -129,6 +130,7 @@ class SacolaItens(models.Model):
     class Meta:
         verbose_name = 'C - SacolaItens'
         verbose_name_plural = 'C - SacolaItens'
+
 
     
     # Registro do Pedido

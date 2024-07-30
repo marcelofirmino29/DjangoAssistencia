@@ -2,26 +2,26 @@ from django.contrib import admin
 from myapp import models
 
 # Registre seus modelos aqui
-admin.site.register(models.Embalagem)
+admin.site.register(models.Tamanho)
 admin.site.register(models.TipoSabor)
 admin.site.register(models.Sabor)
-admin.site.register(models.Cobertura)
+admin.site.register(models.Acompanhamento)
 admin.site.register(models.Pedido)
 
-# Monta Pote
+# Monta pizza
 class SelSaborInline(admin.TabularInline):
     model = models.SelSabor
     extra = 0
 
-@admin.register(models.MontaPote)
-class MontaPoteAdmin(admin.ModelAdmin):
+@admin.register(models.MontaPizza)
+class MontaPizzaAdmin(admin.ModelAdmin):
     inlines = [
         SelSaborInline
     ] 
 
 # Sacola de Itens
-class MontaPoteInline(admin.TabularInline):
-    model = models.SacolaItens.potes.through
+class MontaPizzaInline(admin.TabularInline):
+    model = models.SacolaItens.pizzas.through
     extra = 0
 
 class PedidoInline(admin.StackedInline):
@@ -32,4 +32,4 @@ class PedidoInline(admin.StackedInline):
 class SacolaItensAdmin(admin.ModelAdmin):
     fields = ('preco',)
     readonly_fields = ('preco',)  # Adicione o campo readonly para mostrar o preço total
-    inlines = [PedidoInline,MontaPoteInline]
+    inlines = [PedidoInline,MontaPizzaInline]

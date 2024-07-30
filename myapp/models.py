@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Tipo de Pote (1L - 1/5L - 2L - 400mL - 800mL )
-class Embalagem(models.Model):
+# Tipo de Pizza
+class Tamanho(models.Model):
     tipo = models.CharField(max_length=50)
-    capacidade_maxima_bolas = models.PositiveIntegerField()
+    quantidade_fatias = models.PositiveIntegerField()
     ativo = models.BooleanField()
     preco = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -15,8 +15,8 @@ class Embalagem(models.Model):
         return f'{self.tipo} | PREÇO: R$ {self.preco:.2f}'
 
     class Meta:
-        verbose_name = '1 - Embalagem'
-        verbose_name_plural = '1 - Embalagem'
+        verbose_name = '1 - Tamanho'
+        verbose_name_plural = '1 - Tamanho'
     
     # Tradicional / Premium / Sorbet / Açai
 class TipoSabor(models.Model):
@@ -49,8 +49,8 @@ class Sabor(models.Model):
         verbose_name = '3 - Sabor'
         verbose_name_plural = '3 - Sabor'
 
-    # Coberturas Disponiveis
-class Cobertura(models.Model):
+    # Acompanhamentos Disponiveis
+class Acompanhamento(models.Model):
     nome = models.CharField(max_length=50)
     ativo = models.BooleanField()
     preco = models.DecimalField(max_digits=10, decimal_places=2)
@@ -62,42 +62,42 @@ class Cobertura(models.Model):
         return f'{self.nome} | PREÇO: R$ {self.preco:.2f}'
     
     class Meta:
-        verbose_name = '4 - Cobertura'
-        verbose_name_plural = '4 - Cobertura' 
+        verbose_name = '4 - Acompanhamento'
+        verbose_name_plural = '4 - Acompanhamento' 
 
-# Monta o Pote  
-class MontaPote(models.Model):
-    embalagem = models.ForeignKey(Embalagem, related_name='embalagem', on_delete=models.CASCADE, null=True)
-    coberturas = models.ManyToManyField(Cobertura)
+# Monta a pizza  
+class MontaPizza(models.Model):
+    Tamanho = models.ForeignKey(Tamanho, related_name='Tamanho', on_delete=models.CASCADE, null=True)
+    Acompanhamentos = models.ManyToManyField(Acompanhamento)
     quantidade = models.PositiveIntegerField(null=True)
     
     def preco_total(self):
-        preco_embalagem = self.embalagem.preco if self.embalagem else 0
-        preco_coberturas = sum(cobertura.preco for cobertura in self.coberturas.all())
+        preco_Tamanho = self.Tamanho.preco if self.Tamanho else 0
+        preco_Acompanhamentos = sum(Acompanhamento.preco for Acompanhamento in self.Acompanhamentos.all())
         preco_sabores = 0
-        for selsabor in self.pote.all():
+        for selsabor in self.pizza.all():
             preco_sabor = selsabor.sabor.tipo.preco
-            quantidade_bolas = selsabor.quantidade_bolas
-            preco_sabores += preco_sabor * quantidade_bolas
-        total_pote = preco_embalagem + preco_coberturas + preco_sabores
-        total = total_pote * self.quantidade
+            quantidade_fatias = selsabor.quantidade_fatias
+            preco_sabores += preco_sabor * quantidade_fatias
+        total_pizza = preco_Tamanho + preco_Acompanhamentos + preco_sabores
+        total = total_pizza * self.quantidade
         return total 
 
     def __str__(self):
-        return f"ID: {self.id} / POTE: {self.embalagem.tipo} / Qtd: {self.quantidade} / {self.preco_total()}"
+        return f"ID: {self.id} / pizza: {self.Tamanho.tipo} / Qtd: {self.quantidade} / {self.preco_total()}"
 
     class Meta:
-        verbose_name = 'B - MontaPote'
-        verbose_name_plural = 'B - MontaPote'
+        verbose_name = 'B - MontaPizza'
+        verbose_name_plural = 'B - MontaPizza'
         
 # Seleciona Sabores 
 class SelSabor(models.Model):
-    pote = models.ForeignKey(MontaPote, related_name='pote', on_delete=models.CASCADE, null=True)
+    pizza = models.ForeignKey(MontaPizza, related_name='pizza', on_delete=models.CASCADE, null=True)
     sabor = models.ForeignKey(Sabor, related_name='sabor', on_delete=models.CASCADE, null=True)
-    quantidade_bolas = models.PositiveIntegerField()
+    quantidade_fatias = models.PositiveIntegerField()
     
     def __str__(self):
-        return f"Sabor: {self.sabor.nome}, Quantidade de Bolas: {self.quantidade_bolas}"
+        return f"Sabor: {self.sabor.nome}, Quantidade de Bolas: {self.quantidade_fatias}"
     
     class Meta:
         verbose_name = 'A - SelSabor'
@@ -105,27 +105,31 @@ class SelSabor(models.Model):
 
 # Sacolas de Itens
 class SacolaItens(models.Model):
-    potes = models.ManyToManyField(MontaPote)
-    preco = models.DecimalField(max_digits=10, decimal_places=2)  # Armazena o valor como um número decimal
-  
+    pizzas = models.ManyToManyField(MontaPizza)
+    preco = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     def preco_formatado(self):
-        return f'R$ {self.preco:.2f}'  # Formata o valor com 2 casas decimais
+        return f'R$ {self.preco:.2f}'
 
     def preco_total(self):
-        # Calcule a soma dos preços de todos os potes na sacola
-        sacola_total = 0
-        for pote in self.potes.all():
-            sacola_total += pote.preco_total()
-        self.preco = sacola_total
-        self.save()
+        if not self.pk:
+            # Se o objeto ainda não tem um ID, não calcular o preço
+            return 0
+        sacola_total = sum(pizza.preco_total() for pizza in self.pizzas.all())
         return sacola_total
-        
+
+    def save(self, *args, **kwargs):
+        # Atualizar o preço antes de salvar
+        self.preco = self.preco_total()
+        super().save(*args, **kwargs)  # Chama o método save() real
+
     def __str__(self):
-        return f"CARINHO: {self.id} / {self.preco_total()}"
+        return f"CARRINHO: {self.id} / {self.preco_formatado()}"
 
     class Meta:
         verbose_name = 'C - SacolaItens'
         verbose_name_plural = 'C - SacolaItens'
+
     
     # Registro do Pedido
 class Pedido(models.Model):

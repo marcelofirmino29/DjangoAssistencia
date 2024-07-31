@@ -77,8 +77,7 @@ class MontaPizza(models.Model):
         preco_sabores = 0
         for selsabor in self.pizza.all():
             preco_sabor = selsabor.sabor.tipo.preco
-            quantidade_fatias = selsabor.quantidade_fatias
-            preco_sabores += preco_sabor * quantidade_fatias
+            preco_sabores += preco_sabor
         total_pizza = preco_tamanho + preco_acompanhamentos + preco_sabores
         total = total_pizza * self.quantidade
         return total 
@@ -94,10 +93,9 @@ class MontaPizza(models.Model):
 class SelSabor(models.Model):
     pizza = models.ForeignKey(MontaPizza, related_name='pizza', on_delete=models.CASCADE, null=True)
     sabor = models.ForeignKey(Sabor, related_name='sabor', on_delete=models.CASCADE, null=True)
-    quantidade_fatias = models.PositiveIntegerField()
     
     def __str__(self):
-        return f"Sabor: {self.sabor.nome}, Quantidade de Bolas: {self.quantidade_fatias}"
+        return f"Sabor: {self.sabor.nome}, Pizza: {self.pizza}"
     
     class Meta:
         verbose_name = 'A - SelSabor'

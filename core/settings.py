@@ -18,8 +18,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TEMPLATE_DIR = os.path.join(BASE_DIR,'templates')
 
-STATIC_DIR=os.path.join(BASE_DIR,'static')
-
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Quick-start development settings - unsuitable for production
@@ -188,9 +186,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
 STATIC_URL = '/static/' 
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR,'static')]
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
 MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 MEDIA_URL = '/media/'
 

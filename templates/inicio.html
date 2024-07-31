@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}  
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-normal text-body-emphasis">Nostra Pizza - Mama Mia</h1>
+    <p class="fs-5 text-body-secondary">Bem-vindo à Mama Mia, o seu destino para pizzas e momentos especiais!</p>
+    <p class="fs-5 text-body-secondary">
+        Agora, com nosso cardápio online e serviço de entrega, você pode desfrutar dos nossos deliciosos produtos no conforto da sua casa. Explore nossa diversificada seleção de sabores, desde os clássicos até opções veganas. Garantimos entregas rápidas para você celebrar momentos e indulgências do dia a dia.
+    </p>
+    <p class="fs-5 text-body-secondary">Faça seu pedido e permita-nos proporcionar toda a experiência da boa pizza Mama Mia!</p>
+    <a class="btn btn-dark btn-lg" href="{% url 'cardapio' %}" role="button">Ver Cardápio</a>
+</div> 
+{% endblock %}

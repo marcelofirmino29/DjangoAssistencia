@@ -49,7 +49,7 @@ class Sabor(models.Model):
         verbose_name = '3 - Sabor'
         verbose_name_plural = '3 - Sabor'
 
-    # Acompanhamentos Disponiveis
+    # acompanhamentos Disponiveis
 class Acompanhamento(models.Model):
     nome = models.CharField(max_length=50)
     ativo = models.BooleanField()
@@ -67,24 +67,24 @@ class Acompanhamento(models.Model):
 
 # Monta a pizza  
 class MontaPizza(models.Model):
-    Tamanho = models.ForeignKey(Tamanho, related_name='Tamanho', on_delete=models.CASCADE, null=True)
-    Acompanhamentos = models.ManyToManyField(Acompanhamento)
+    tamanho = models.ForeignKey(Tamanho, related_name='tamanho', on_delete=models.CASCADE, null=True)
+    acompanhamentos = models.ManyToManyField(Acompanhamento)
     quantidade = models.PositiveIntegerField(null=True)
     
     def preco_total(self):
-        preco_Tamanho = self.Tamanho.preco if self.Tamanho else 0
-        preco_Acompanhamentos = sum(Acompanhamento.preco for Acompanhamento in self.Acompanhamentos.all())
+        preco_tamanho = self.tamanho.preco if self.tamanho else 0
+        preco_acompanhamentos = sum(acompanhamento.preco for acompanhamento in self.acompanhamentos.all())
         preco_sabores = 0
         for selsabor in self.pizza.all():
             preco_sabor = selsabor.sabor.tipo.preco
             quantidade_fatias = selsabor.quantidade_fatias
             preco_sabores += preco_sabor * quantidade_fatias
-        total_pizza = preco_Tamanho + preco_Acompanhamentos + preco_sabores
+        total_pizza = preco_tamanho + preco_acompanhamentos + preco_sabores
         total = total_pizza * self.quantidade
         return total 
 
     def __str__(self):
-        return f"ID: {self.id} / pizza: {self.Tamanho.tipo} / Qtd: {self.quantidade} / {self.preco_total()}"
+        return f"ID: {self.id} / pizza: {self.tamanho.tipo} / Qtd: {self.quantidade} / {self.preco_total()}"
 
     class Meta:
         verbose_name = 'B - MontaPizza'
@@ -104,35 +104,29 @@ class SelSabor(models.Model):
         verbose_name_plural = 'A - SelSabor'
 
 # Sacolas de Itens
-# Sacolas de Itens
 class SacolaItens(models.Model):
     pizzas = models.ManyToManyField(MontaPizza)
-    preco = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
+    preco = models.DecimalField(max_digits=10, decimal_places=2, null=True)  # Armazena o valor como um número decimal
+  
     def preco_formatado(self):
-        return f'R$ {self.preco:.2f}'
+        return f'R$ {self.preco:.2f}'  # Formata o valor com 2 casas decimais
 
     def preco_total(self):
-        # Certifica-se de que a sacola já tenha um ID antes de tentar calcular o preço total
-        if not self.pk:
-            return 0
-        sacola_total = sum(pizza.preco_total() for pizza in self.pizzas.all())
+        # Calcule a soma dos preços de todos os pizzas na sacola
+        sacola_total = 0
+        for pizza in self.pizzas.all():
+            sacola_total += pizza.preco_total()
+        self.preco = sacola_total
+        self.save()
         return sacola_total
-
-    def save(self, *args, **kwargs):
-        # Atualizar o preço antes de salvar
-        self.preco = self.preco_total()
-        super().save(*args, **kwargs)  # Chama o método save() real
-
+        
     def __str__(self):
-        return f"CARRINHO: {self.id} / {self.preco_formatado()}"
+        return f"CARRINHO: {self.id} / {self.preco_total()}"
 
     class Meta:
         verbose_name = 'C - SacolaItens'
         verbose_name_plural = 'C - SacolaItens'
 
-
-    
     # Registro do Pedido
 class Pedido(models.Model):
     data_pedido = models.DateTimeField(auto_now_add=True, null=True)

@@ -18,7 +18,7 @@ class Tamanho(models.Model):
         verbose_name = '1 - Tamanho'
         verbose_name_plural = '1 - Tamanho'
     
-    # Tradicional / Premium / Sorbet / Açai
+    # Tradicional / Especial
 class TipoSabor(models.Model):
     tipo = models.CharField(max_length=100)
     ativo = models.BooleanField()
@@ -95,7 +95,7 @@ class SelSabor(models.Model):
     sabor = models.ForeignKey(Sabor, related_name='sabor', on_delete=models.CASCADE, null=True)
     
     def __str__(self):
-        return f"Sabor: {self.sabor.nome}, Pizza: {self.pizza}"
+        return f"Sabor: {self.sabor.nome}, Quantidade de Fatias: {self.pizza}"
     
     class Meta:
         verbose_name = 'A - SelSabor'

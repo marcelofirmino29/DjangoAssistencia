@@ -13,7 +13,7 @@
 			background-image: url('https://th.bing.com/th/id/OIP.VCQQ1ZvdoxmewQHMn1s5vgHaE7?rs=1&pid=ImgDetMain');">
 			<div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
 				<ul class="d-flex list-unstyled mt-auto text-dark">
-					<li class="d-flex align-items-center me-3"> 
+					<li class="d-flex align-items-center me-1"> 
 
 					</li>
 					<li class="d-flex align-items-center">
@@ -34,3 +34,75 @@
 	{% endfor %}
 </div> 
 {% endblock %}
+
+{% block scripts %}
+	<script>
+function atualizarColorSuccess(modalId) {
+	$('#impResponse'+modalId).removeClass('bg-success')
+	$('#impResponse'+modalId).addClass('bg-secondary')
+}
+function atualizarColorDanger(modalId) {
+	$('#impResponse'+modalId).removeClass('bg-secondary')
+	$('#impResponse'+modalId).addClass('bg-success')
+} 
+ 
+$(document).on('click', '.plus', function() {
+	var modalId = $(this).closest('.modal').data('modalid');
+	var input = $(this).siblings('input.count_' + modalId);
+	var capacidadeMaxima = $('#selsabor_' + modalId).data('capmax');
+	var totalSelecionado = 0;
+
+	// Calcular o total selecionado para todos os sabores
+	$('.count_' + modalId).each(function() {
+		totalSelecionado += parseInt($(this).val());
+	});
+
+	// Calcular o total selecionado para todos os sabores
+	if ((totalSelecionado + 1) <= (capacidadeMaxima)) {
+		input.val(parseInt(input.val()) + 1);
+		atualizarColorSuccess(modalId)
+
+		if ((totalSelecionado + 1) == capacidadeMaxima) {
+			atualizarColorDanger(modalId)
+		}
+	} else { 
+		// Excedeu a capacidade máxima  
+		atualizarColorDanger(modalId)
+		console.log('Capacidade máxima atingida');
+
+	}
+
+	// Atualizar o totalSelecionado após a adição
+	atualizarTotalSelecionado(modalId);
+});
+
+$(document).on('click', '.minus', function() {
+	var modalId = $(this).closest('.modal').data('modalid');
+	var input = $(this).siblings('input.count_' + modalId);
+
+	input.val(parseInt(input.val()) - 1);
+	if (input.val() < 0) {
+		input.val(0);
+	}
+	atualizarColorSuccess(modalId)
+
+	// Atualizar o totalSelecionado após a subtração
+	atualizarTotalSelecionado(modalId);
+});
+
+// Acompanhamentos/Adicionais 
+$(document).on('click', '.plus', function(){
+	var modalId = $(this).closest('.modal').data('modalid');
+	var input = $(this).siblings('input.selacompanhamento_'+modalId); 
+	input.val(parseInt(input.val()) + 1); 
+});
+$(document).on('click', '.minus', function(){
+	var modalId = $(this).closest('.modal').data('modalid');
+	var input = $(this).siblings('input.selacompanhamento_'+modalId); 
+	input.val(parseInt(input.val()) - 1);
+	if (input.val() < 0) {
+		input.val(0);
+	} 
+});
+</script>
+{% endblock scripts %}

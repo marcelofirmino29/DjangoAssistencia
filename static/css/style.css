@@ -14,10 +14,27 @@ body {
     padding: 10px;
 }
 
+/* Modal */
+.modal-dialog {
+    max-width: 100%;
+    margin: 1.75rem auto;
+}
+
+/* Modal Header */
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 1rem;
+}
+
 /* Contador */ 
 .qty {
     width: 150px;
 }
+
 .qty .count {
     color: #b11b3e;
     display: inline-block;
@@ -25,54 +42,78 @@ body {
     font-size: 25px;
     font-weight: 700;
     line-height: 30px;
-    padding: 0 2px
-    ;min-width: 35px;
+    padding: 0 2px;
+    min-width: 35px;
     text-align: center;
 }
-.qty .plus {
+
+.qty .plus, .qty .minus {
     cursor: pointer;
     display: inline-block;
     vertical-align: top;
-    color: #219612;
     width: 30px;
     height: 30px;
-    font: 30px/1 Arial,sans-serif;
-    text-align: center;
-    border-radius: 50%;
-    }
-.qty .minus {
-    cursor: pointer;
-    display: inline-block;
-    vertical-align: top;
-    color: #b11b3e;
-    width: 30px;
-    height: 30px;
-    font: 30px/1 Arial,sans-serif;
+    font-size: 1.5rem; /* Ajustado para flexibilidade */
+    line-height: 30px;
     text-align: center;
     border-radius: 50%;
     background-clip: padding-box;
 }
-div {
-    text-align: center;
+
+.qty .plus {
+    color: #219612;
 }
-.minus:hover{
-    background-color: #717fe0 !important;
+
+.qty .minus {
+    color: #b11b3e;
+    background-color: #ffffff;
+    border: 1px solid #b11b3e; /* Adicionado para melhor contraste */
 }
-.plus:hover{
-    background-color: #717fe0 !important;
+
+.qty .plus:hover, .qty .minus:hover {
+    background-color: #717fe0;
+    color: #ffffff; /* Garantir boa legibilidade no hover */
 }
-/*Prevent text selection*/ 
-input{  
+
+/* Prevent text selection */
+input {  
     border: 0;
-    width: 20%;
+    width: 100%;
     text-align: center;
+    font-size: 1rem; /* Ajustado para responsividade */
 }
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-input:disabled{
-    background-color:white;
+
+input:disabled {
+    background-color: #f1f1f1; /* Alterado para visualização de input desabilitado */
+    color: #aaa; /* Alterado para contraste */
 }
 
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 0;
+        max-width: 100%;
+    }
+    
+    .qty {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .qty .count {
+        font-size: 1.2rem;
+    }
+    
+    .qty .plus, .qty .minus {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}
